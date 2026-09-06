@@ -6,6 +6,7 @@ import {
   Stethoscope,
   ShieldUser,
   Stethoscope as DoctorsIcon,
+  UserRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
+import { roleLabel } from "@/lib/role-labels";
 import type { User } from "@/interfaces/user.interface";
 import { useAuthStore } from "@/auth/store/auth.store";
 import { CustomLogo } from "@/components/custom/CustomLogo";
@@ -30,15 +33,9 @@ const menuItemClass =
 const sectionLabelClass =
   "mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground";
 
-const roleLabel: Record<User["role"], string> = {
-  PATIENT: "Paciente",
-  DOCTOR: "Doctor/a",
-  ADMIN: "Administrador/a",
-};
-
 export const CustomMobileMenu = ({ user }: Props) => {
   const logout = useAuthStore((state) => state.logout);
-  const initials = user ? user.email.slice(0, 2).toUpperCase() : "";
+  const displayName = user ? user.name || user.email : "";
 
   return (
     <Sheet>
@@ -78,14 +75,20 @@ export const CustomMobileMenu = ({ user }: Props) => {
             {user ? (
               <>
                 <div className="mb-3 flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3">
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-                    {initials}
-                  </span>
+                  <DoctorAvatar
+                    name={displayName}
+                    photoUrl={user.photoUrl ?? null}
+                    className="size-9 shrink-0 rounded-full"
+                    initialsClassName="text-xs"
+                  />
                   <div className="min-w-0">
                     <p className="truncate font-display text-sm font-semibold text-foreground">
-                      {roleLabel[user.role]}
+                      {displayName}
                     </p>
                     <p className="truncate text-xs text-muted-foreground">
+                      {roleLabel[user.role]}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground/70">
                       {user.email}
                     </p>
                   </div>
@@ -93,12 +96,20 @@ export const CustomMobileMenu = ({ user }: Props) => {
 
                 <div className="flex flex-col gap-0.5">
                   {user.role === "PATIENT" && (
-                    <SheetClose asChild>
-                      <Link to="/appointments/mine" className={menuItemClass}>
-                        <CalendarClock className="size-4 text-muted-foreground" />
-                        Mis turnos
-                      </Link>
-                    </SheetClose>
+                    <>
+                      <SheetClose asChild>
+                        <Link to="/account" className={menuItemClass}>
+                          <UserRound className="size-4 text-muted-foreground" />
+                          Mi perfil
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/appointments/mine" className={menuItemClass}>
+                          <CalendarClock className="size-4 text-muted-foreground" />
+                          Mis turnos
+                        </Link>
+                      </SheetClose>
+                    </>
                   )}
                   {user.role === "DOCTOR" && (
                     <SheetClose asChild>

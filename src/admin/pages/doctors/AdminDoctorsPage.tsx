@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { AdminTitle } from "@/admin/components/AdminTitle";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/custom/ConfirmDialog";
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { useDoctors } from "@/doctors/hooks/useDoctors";
 import { useDoctorsAdmin } from "@/admin/hooks/useDoctorsAdmin";
+import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
 import type { Doctor } from "@/interfaces/doctor.interface";
 import { DoctorFormDialog } from "./components/DoctorFormDialog";
 import { KeyRound, PencilIcon, PlusIcon, Trash2 } from "lucide-react";
@@ -20,7 +22,6 @@ export const AdminDoctorsPage = () => {
   const { data: doctors, isLoading } = useDoctors();
   const { deactivate, resetPassword } = useDoctorsAdmin();
 
-  const [formDoctor, setFormDoctor] = useState<Doctor | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [deactivateTarget, setDeactivateTarget] = useState<Doctor | null>(null);
   const [resetTarget, setResetTarget] = useState<Doctor | null>(null);
@@ -35,12 +36,7 @@ export const AdminDoctorsPage = () => {
           description="Creá, editá y desactivá doctores del catálogo."
         />
 
-        <Button
-          onClick={() => {
-            setFormDoctor(null);
-            setFormOpen(true);
-          }}
-        >
+        <Button onClick={() => setFormOpen(true)}>
           <PlusIcon />
           Nuevo doctor
         </Button>
@@ -50,56 +46,62 @@ export const AdminDoctorsPage = () => {
         <Table className="w-full min-w-[700px]">
           <TableHeader>
             <TableRow>
+              <TableHead>Foto</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Especialidad</TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {doctors?.map((doctor) => (
-              <TableRow key={doctor.id}>
-                <TableCell className="font-medium">{doctor.name}</TableCell>
-                <TableCell>{doctor.specialty}</TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => {
-                        setFormDoctor(doctor);
-                        setFormOpen(true);
-                      }}
-                    >
-                      <PencilIcon className="size-4 text-primary" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => setResetTarget(doctor)}
-                    >
-                      <KeyRound className="size-4 text-muted-foreground" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => setDeactivateTarget(doctor)}
-                    >
-                      <Trash2 className="size-4 text-destructive" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {doctors?.map((doctor) => {
+              return (
+                <TableRow key={doctor.id}>
+                  <TableCell>
+                    <DoctorAvatar
+                      name={doctor.name}
+                      photoUrl={doctor.photoUrl}
+                      className="size-10 rounded-full border border-border"
+                      initialsClassName="text-xs"
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{doctor.name}</TableCell>
+                  <TableCell>{doctor.specialty}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Link to={`/admin/doctors/${doctor.id}/edit`}>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`Editar a ${doctor.name}`}
+                          title="Editar"
+                        >
+                          <PencilIcon className="size-4 text-primary" />
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setResetTarget(doctor)}
+                      >
+                        <KeyRound className="size-4 text-muted-foreground" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setDeactivateTarget(doctor)}
+                      >
+                        <Trash2 className="size-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
 
-      <DoctorFormDialog
-        key={formDoctor?.id ?? "new"}
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        doctor={formDoctor ?? undefined}
-      />
+      <DoctorFormDialog open={formOpen} onOpenChange={setFormOpen} />
 
       <ConfirmDialog
         open={!!deactivateTarget}

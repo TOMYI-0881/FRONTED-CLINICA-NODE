@@ -9,13 +9,17 @@ export const useBookAppointment = (doctorId: string | undefined, date: string) =
   return useMutation({
     mutationFn: postAppointmentAction,
     onSuccess: () => {
-      toast.success("Turno reservado con éxito");
+      toast.success("Turno reservado con éxito. Ya estás en la fila automáticamente");
       queryClient.invalidateQueries({ queryKey: ["availability", doctorId, date] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "mine"] });
+      queryClient.invalidateQueries({ queryKey: ["queue"] });
     },
     onError: (error) => {
       if (isAxiosError(error) && error.response?.status === 409) {
-        toast.error("Ese horario ya fue tomado, elegí otro");
+        const message =
+          (error.response.data as { error?: string } | undefined)?.error ??
+          "Ese horario ya fue tomado, elegí otro";
+        toast.error(message);
         queryClient.invalidateQueries({ queryKey: ["availability", doctorId, date] });
       }
     },

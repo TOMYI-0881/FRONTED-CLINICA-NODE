@@ -6,6 +6,7 @@ import { useQueue } from "@/queues/hooks/useQueue";
 import { CurrentTurnCard } from "@/queues/components/CurrentTurnCard";
 import { WaitingList } from "@/queues/components/WaitingList";
 import { CheckInForm } from "@/queues/components/CheckInForm";
+import { MyTurnCard } from "@/queues/components/MyTurnCard";
 import { todayApiDate } from "@/lib/format-date";
 
 export const QueueLivePage = () => {
@@ -47,17 +48,16 @@ export const QueueLivePage = () => {
           <WaitingList waiting={queue?.waiting ?? []} />
         </div>
 
-        {isPatient && doctorId && (
-          <CheckInForm
-            doctorId={doctorId}
-            appointmentId={todaysAppointment?.id}
-            title={
-              todaysAppointment
-                ? "Hacer check-in con tu cita de hoy"
-                : "Hacer check-in sin cita previa"
-            }
-          />
-        )}
+        {isPatient && doctorId && (queue?.myTurn ? (
+          <MyTurnCard turn={queue.myTurn} />
+        ) : todaysAppointment ? (
+          <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+            Tu cita de hoy está confirmada. Tu turno en la cola ya fue asignado
+            automáticamente al momento de reservar.
+          </div>
+        ) : (
+          <CheckInForm doctorId={doctorId} title="Hacer check-in sin cita previa" />
+        ))}
       </div>
     </div>
   );

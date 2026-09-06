@@ -7,6 +7,7 @@ export interface Appointment {
   id: string;
   doctorId: string;
   patientId: string;
+  patientEmail?: string;
   startTime: string;
   endTime: string;
   status: AppointmentStatus;

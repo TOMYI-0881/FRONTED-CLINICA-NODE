@@ -17,10 +17,11 @@ export function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
     setIsPosting(true);
 
     const formData = new FormData(event.target as HTMLFormElement);
+    const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const isValid = await useAuthStore.getState().register(email, password);
+    const isValid = await useAuthStore.getState().register(name, email, password);
     if (isValid) {
       navigate("/");
       return;
@@ -36,6 +37,20 @@ export function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
       </p>
 
       <form className="mt-8 space-y-5" onSubmit={handleRegister}>
+        <div>
+          <label className="text-sm font-semibold">Nombre</label>
+          <Input
+            id="name"
+            type="text"
+            name="name"
+            placeholder="Tu nombre y apellido"
+            autoComplete="name"
+            minLength={2}
+            maxLength={120}
+            className="mt-2 h-11 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            required
+          />
+        </div>
         <div>
           <label className="text-sm font-semibold">Correo electrónico</label>
           <Input

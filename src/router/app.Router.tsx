@@ -6,15 +6,18 @@ import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 
 import { PublicLayout } from "@/layout/layouts/PublicLayout";
-import { DoctorsListPage } from "@/doctors/pages/list/DoctorsListPage";
+import { HomePage } from "@/home/pages/HomePage";
 import { BookingPage } from "@/appointments/pages/booking/BookingPage";
 import { MyAppointmentsPage } from "@/appointments/pages/my-appointments/MyAppointmentsPage";
+import { MyAccountPage } from "@/appointments/pages/my-account/MyAccountPage";
 import { QueueLivePage } from "@/queues/pages/live/QueueLivePage";
 
 import { DoctorQueuePage } from "@/queues/pages/doctor/DoctorQueuePage";
 import { DoctorAppointmentsPage } from "@/appointments/pages/doctor-appointments/DoctorAppointmentsPage";
+import { DoctorProfilePage } from "@/doctors/pages/DoctorProfilePage";
 
 import { AdminDoctorsPage } from "@/admin/pages/doctors/AdminDoctorsPage";
+import { EditDoctorPage } from "@/admin/pages/doctors/EditDoctorPage";
 import { AdminAppointmentsPage } from "@/admin/pages/appointments/AdminAppointmentsPage";
 import { AdminCancellationRequestsPage } from "@/cancellation-requests/pages/admin/AdminCancellationRequestsPage";
 import { AdminQueueControlPage } from "@/queues/pages/admin/AdminQueueControlPage";
@@ -40,7 +43,7 @@ export const appRouter = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <DoctorsListPage />,
+        element: <HomePage />,
       },
       {
         path: "doctors/:doctorId",
@@ -55,6 +58,14 @@ export const appRouter = createBrowserRouter([
         element: (
           <PatientRoute>
             <MyAppointmentsPage />
+          </PatientRoute>
+        ),
+      },
+      {
+        path: "account",
+        element: (
+          <PatientRoute>
+            <MyAccountPage />
           </PatientRoute>
         ),
       },
@@ -108,6 +119,10 @@ export const appRouter = createBrowserRouter([
         path: "appointments",
         element: <DoctorAppointmentsPage />,
       },
+      {
+        path: "profile",
+        element: <DoctorProfilePage />,
+      },
     ],
   },
 
@@ -127,6 +142,10 @@ export const appRouter = createBrowserRouter([
       {
         path: "doctors",
         element: <AdminDoctorsPage />,
+      },
+      {
+        path: "doctors/:doctorId/edit",
+        element: <EditDoctorPage />,
       },
       {
         path: "appointments",

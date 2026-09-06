@@ -8,11 +8,10 @@ import { useCheckIn } from "../hooks/useCheckIn";
 
 interface Props {
   doctorId: string;
-  appointmentId?: string;
   title?: string;
 }
 
-export const CheckInForm = ({ doctorId, appointmentId, title }: Props) => {
+export const CheckInForm = ({ doctorId, title }: Props) => {
   const [patientName, setPatientName] = useState("");
   const [priority, setPriority] = useState<TurnPriority>("normal");
   const checkIn = useCheckIn(doctorId);
@@ -22,7 +21,7 @@ export const CheckInForm = ({ doctorId, appointmentId, title }: Props) => {
     if (!patientName.trim()) return;
 
     checkIn.mutate(
-      { doctorId, patientName: patientName.trim(), priority, appointmentId },
+      { doctorId, patientName: patientName.trim(), priority },
       { onSuccess: () => setPatientName("") },
     );
   };

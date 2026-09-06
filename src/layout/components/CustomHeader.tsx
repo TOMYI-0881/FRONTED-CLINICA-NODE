@@ -42,14 +42,27 @@ export const CustomHeader = () => {
             <CustomLogo />
           </div>
 
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-sm font-medium transition-colors hover:text-primary"
+          <nav className="hidden md:flex items-center space-x-8"></nav>
+
+          {(!user || user.role === "PATIENT") && (
+            <nav
+              className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex"
+              aria-label="Navegación principal"
             >
-              Doctores
-            </Link>
-          </nav>
+              <Link
+                to="/"
+                className="text-sm font-medium transition-colors hover:text-primary"
+              >
+                Profesionales
+              </Link>
+              <a
+                href="#ofertas"
+                className="transition-colors hover:text-foreground"
+              >
+                Ofertas
+              </a>
+            </nav>
+          )}
 
           <div className="flex items-center space-x-4">
             <div className="hidden md:flex items-center space-x-2">

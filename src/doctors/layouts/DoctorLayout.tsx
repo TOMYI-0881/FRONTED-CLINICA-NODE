@@ -1,12 +1,14 @@
 import { Link, Outlet, ScrollRestoration, useLocation } from "react-router";
-import { CalendarClock, LogOut, Radio } from "lucide-react";
+import { CalendarClock, LogOut, Radio, UserRound } from "lucide-react";
 import { CustomLogo } from "@/components/custom/CustomLogo";
 import { useAuthStore } from "@/auth/store/auth.store";
+import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: "/doctor/queue", label: "Mi cola", icon: Radio },
   { to: "/doctor/appointments", label: "Mis citas", icon: CalendarClock },
+  { to: "/doctor/profile", label: "Mi perfil", icon: UserRound },
 ];
 
 const DoctorLayout = () => {
@@ -46,7 +48,21 @@ const DoctorLayout = () => {
       </header>
 
       <div className="border-b border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground lg:px-8">
-        {user?.email}
+        <Link
+          to="/doctor/profile"
+          className="group inline-flex items-center gap-2"
+          title="Mi perfil"
+        >
+          <DoctorAvatar
+            name={user?.name ?? user?.email ?? ""}
+            photoUrl={user?.photoUrl ?? null}
+            className="size-8 rounded-full border border-border bg-background"
+            initialsClassName="text-xs"
+          />
+          <span className="font-medium text-foreground group-hover:underline">
+            {user?.email}
+          </span>
+        </Link>
       </div>
 
       <Outlet />

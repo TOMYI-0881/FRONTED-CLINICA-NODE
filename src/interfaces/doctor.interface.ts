@@ -3,6 +3,7 @@ export interface Doctor {
   userId: string;
   name: string;
   specialty: string;
+  photoUrl?: string | null;
   isActive: boolean;
   createdAt: string;
 }

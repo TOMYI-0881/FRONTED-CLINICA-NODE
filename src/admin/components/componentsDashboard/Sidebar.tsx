@@ -10,6 +10,8 @@ import {
   X,
 } from "lucide-react";
 import { CustomLogo } from "@/components/custom/CustomLogo";
+import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
+import { roleLabel } from "@/lib/role-labels";
 import { Link, useLocation } from "react-router";
 import { useAuthStore } from "@/auth/store/auth.store";
 
@@ -104,15 +106,18 @@ const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
         {!collapsed && (
           <div className="p-3 border-t border-sidebar-border">
             <div className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-accent transition-colors cursor-pointer">
-              <div className="h-9 w-9 rounded-full bg-primary/100 border border-primary/20 flex items-center justify-center text-white font-semibold text-sm">
-                {user?.email.slice(0, 2).toUpperCase()}
-              </div>
+              <DoctorAvatar
+                name={user?.name || user?.email || ""}
+                photoUrl={user?.photoUrl ?? null}
+                className="size-9 shrink-0 rounded-full border border-primary/20 bg-primary font-display text-sm text-white"
+                initialsClassName="text-sm"
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-sidebar-foreground truncate">
-                  Administrador/a
+                  {user?.name || user?.email}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {user?.email}
+                  {user ? roleLabel[user.role] : ""} · {user?.email}
                 </p>
               </div>
             </div>

@@ -19,9 +19,11 @@ type AuthStore = {
 
   //actions
   login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   checkAuthStatus: () => void;
+  setUserPhoto: (photoUrl: string | null) => void;
+  setUserProfile: (data: { name?: string; email?: string }) => void;
 };
 
 const persistSession = (user: User, token: string) => {
@@ -60,9 +62,9 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     }
   },
 
-  register: async (email: string, password: string): Promise<boolean> => {
+  register: async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      await postRegisterAction(email, password);
+      await postRegisterAction(name, email, password);
       // El registro no devuelve token -- logueamos inmediatamente después.
       return await get().login(email, password);
     } catch {
@@ -75,6 +77,25 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   logout: () => {
     clearSession();
     set({ user: null, token: null, authStatus: "not-authenticated" });
+  },
+
+  // Tras subir/quitar la propia foto, sincroniza el user del store y lo
+  // re-persiste para que el avatar del header/paneles se actualice.
+  setUserPhoto: (photoUrl: string | null) => {
+    const { user, token } = get();
+    if (!user) return;
+    const updated = { ...user, photoUrl };
+    if (token) persistSession(updated, token);
+    set({ user: updated });
+  },
+
+  // Tras editar nombre/correo, sincroniza el user del store y lo re-persiste.
+  setUserProfile: (data: { name?: string; email?: string }) => {
+    const { user, token } = get();
+    if (!user) return;
+    const updated = { ...user, ...data };
+    if (token) persistSession(updated, token);
+    set({ user: updated });
   },
 
   // No hay endpoint de refresh/check-status en este backend (ver guía, sec. 3 y 11):

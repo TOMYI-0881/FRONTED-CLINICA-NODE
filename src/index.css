@@ -131,4 +131,48 @@
 
 @theme {
   --font-montserrat: "Montserrat Alternates", sans-serif;
+  --font-display: "Montserrat Alternates", sans-serif;
+
+  /* Rebranding "Tomy Turnos": acento coral + cristal (frost) + superficie */
+  --color-coral: oklch(0.62 0.19 28);
+  --color-coral-light: oklch(0.93 0.05 28);
+  --color-frost: oklch(0.985 0.003 250 / 0.6);
+  --color-frost-edge: oklch(0.92 0.006 250 / 0.55);
+  --color-surface: oklch(0.99 0 0);
+
+  --animate-fade-up: fade-up 0.55s ease-out both;
+  --animate-gentle-pulse: gentle-pulse 2.4s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes gentle-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.55;
+      transform: scale(0.82);
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }

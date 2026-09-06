@@ -41,9 +41,16 @@ export const DoctorAppointmentsPage = () => {
         {sorted.map((appointment) => (
           <Card key={appointment.id}>
             <CardContent className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-foreground">
-                {formatDateTimeLocal(appointment.startTime)}
-              </p>
+              <div className="min-w-0">
+                <p className="text-sm text-foreground">
+                  {formatDateTimeLocal(appointment.startTime)}
+                </p>
+                {appointment.patientEmail && (
+                  <p className="truncate text-xs text-muted-foreground">
+                    {appointment.patientEmail}
+                  </p>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <AppointmentStatusBadge status={appointment.status} />
                 {appointment.status === "CONFIRMED" && (

@@ -17,4 +17,5 @@ export interface Turn {
 export interface QueueState {
   current: Turn | null;
   waiting: Turn[];
+  myTurn: Turn | null;
 }
