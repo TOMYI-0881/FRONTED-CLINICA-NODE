@@ -4,26 +4,32 @@ import { appRouter } from "./router/app.Router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
-import { useState, type PropsWithChildren } from "react";
+import { useEffect, type PropsWithChildren } from "react";
 import { AppLoader } from "./layout/components/AppLoader";
-// La sesión se valida una sola vez al importar auth.store (no hay
-// endpoint de refresh/check-status en este backend).
-import "./auth/store/auth.store";
+import { useAuthStore } from "@/auth/store/auth.store";
 
-export const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
+// La sesión se restaura acá: no hay endpoint de refresh/check-status en este
+// backend, así que se valida el JWT persistido en localStorage al montar la
+// app. Mientras authStatus === "checking", los guards devuelven null y el
+// splash (AppLoader) cubre esa ventana de arranque.
 const CheckAuthProvider = ({ children }: PropsWithChildren) => {
-  const [isReady, setIsReady] = useState(false);
+  const authStatus = useAuthStore((state) => state.authStatus);
+
+  useEffect(() => {
+    useAuthStore.getState().checkAuthStatus();
+  }, []);
 
   return (
     <>
       {children}
-      {!isReady && <AppLoader onComplete={() => setIsReady(true)} />}
+      {authStatus === "checking" && <AppLoader />}
     </>
   );
 };
 
-export const TomyiShopApp = () => (
+export const ClinicApp = () => (
   <QueryClientProvider client={queryClient}>
     <Toaster />
 

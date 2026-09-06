@@ -1,2 +1,2 @@
-allowBuilds:
-  msw: set this to true or false
+# Proyecto de un solo paquete (no es un workspace de pnpm).
+# Este archivo se mantiene vacío a propósito; eliminarlo también es válido.

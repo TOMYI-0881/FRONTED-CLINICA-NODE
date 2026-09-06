@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { LoginForm } from "@/auth/pages/login/LoginForm";
-import { RegisterForm } from "@/auth/pages/register/RegisterPage";
+import { RegisterForm } from "@/auth/pages/register/RegisterForm";
 import { CalendarClock, Radio, Stethoscope } from "lucide-react";
 
 function getModeFromPath(pathname: string): "login" | "register" {
@@ -39,7 +39,7 @@ const HeroPanel = () => (
   </div>
 );
 
-export function LoginPage() {
+export default function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
 

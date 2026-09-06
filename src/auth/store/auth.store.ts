@@ -103,8 +103,3 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 authEvents.addEventListener("unauthorized", () => {
   useAuthStore.getState().logout();
 });
-
-// Se valida una sola vez al cargar el módulo: no hay endpoint de
-// refresh/check-status, así que la sesión se restaura desde el JWT
-// persistido en localStorage (ver checkAuthStatus arriba).
-useAuthStore.getState().checkAuthStatus();

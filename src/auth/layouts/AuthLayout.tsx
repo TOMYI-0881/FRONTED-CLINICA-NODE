@@ -1,9 +1,9 @@
-import { LoginPage } from "../pages/login/LoginPage";
+import { Outlet } from "react-router";
 
 const AuthLayout = () => {
   return (
     <div>
-      <LoginPage />
+      <Outlet />
     </div>
   );
 };

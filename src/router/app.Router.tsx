@@ -1,3 +1,7 @@
+// El router exporta la configuración (objeto, no un componente) junto con
+// páginas lazy, por lo que el archivo no puede fast-refresh. Se desactiva la
+// regla de forma puntual para preservar el patrón lazy + createBrowserRouter.
+/* eslint-disable react-refresh/only-export-components */
 import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 
@@ -24,8 +28,9 @@ import {
 } from "./ProtectedRoutes";
 
 const AuthLayout = lazy(() => import("../auth/layouts/AuthLayout"));
+const LoginPage = lazy(() => import("../auth/pages/login/LoginPage"));
 const AdminLayout = lazy(() => import("../admin/layouts/AdminLayout"));
-const DoctorLayout = lazy(() => import("../doctor/layouts/DoctorLayout"));
+const DoctorLayout = lazy(() => import("../doctors/layouts/DoctorLayout"));
 
 export const appRouter = createBrowserRouter([
   // Public / Patient routes
@@ -71,11 +76,13 @@ export const appRouter = createBrowserRouter([
       },
       {
         path: "login",
-        element: <></>,
+        element: <LoginPage />,
       },
+      // Ambos modos (login/register) viven en el mismo panel animado:
+      // LoginPage decide cuál mostrar según location.pathname.
       {
         path: "register",
-        element: <></>,
+        element: <LoginPage />,
       },
     ],
   },

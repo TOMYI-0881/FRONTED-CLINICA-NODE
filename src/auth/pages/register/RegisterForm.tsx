@@ -93,7 +93,3 @@ export function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
     </div>
   );
 }
-
-export const RegisterPage = () => {
-  return <RegisterForm onSwitch={() => {}} />;
-};
