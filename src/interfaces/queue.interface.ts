@@ -8,6 +8,7 @@ export interface Turn {
   queueDate: string;
   number: number;
   patientName: string;
+  photoUrl: string | null;
   priority: TurnPriority;
   status: TurnStatus;
   createdAt: string;

@@ -57,18 +57,21 @@ Registra un usuario nuevo. Siempre se crea con rol `PATIENT`.
 **Body**
 
 ```json
-{ "email": "paciente@test.com", "password": "secret123" }
+{ "email": "paciente@test.com", "password": "secret123", "name": "Juan Perez" }
 ```
 
 - `email`: string, formato email
 - `password`: string, mínimo 6 caracteres
+- `name`: string, entre 2 y 120 caracteres (se usa como nombre visible, ej. en la lista de
+  espera de la cola en vivo)
 
 **Respuestas**
-| Status | Cuándo |
-|---|---|
-| 201 | Usuario creado. Devuelve el usuario (sin `passwordHash`) |
-| 400 | Datos inválidos (zod) |
-| 409 | El email ya está registrado |
+
+| Status | Cuándo                                                   |
+| ------ | -------------------------------------------------------- |
+| 201    | Usuario creado. Devuelve el usuario (sin `passwordHash`) |
+| 400    | Datos inválidos (zod)                                    |
+| 409    | El email ya está registrado                              |
 
 ```json
 // 201
@@ -77,7 +80,8 @@ Registra un usuario nuevo. Siempre se crea con rol `PATIENT`.
   "email": "paciente@test.com",
   "role": "PATIENT",
   "createdAt": "2026-...",
-  "photoUrl": null
+  "photoUrl": null,
+  "name": "Juan Perez"
 }
 ```
 
@@ -94,11 +98,12 @@ Autentica y devuelve un JWT.
 ```
 
 **Respuestas**
-| Status | Cuándo |
-|---|---|
-| 200 | Login exitoso |
-| 401 | Credenciales inválidas |
-| 429 | Demasiados intentos |
+
+| Status | Cuándo                 |
+| ------ | ---------------------- |
+| 200    | Login exitoso          |
+| 401    | Credenciales inválidas |
+| 429    | Demasiados intentos    |
 
 ```json
 // 200
@@ -109,7 +114,8 @@ Autentica y devuelve un JWT.
     "email": "paciente@test.com",
     "role": "PATIENT",
     "createdAt": "2026-...",
-    "photoUrl": null
+    "photoUrl": null,
+    "name": "Juan Perez"
   }
 }
 ```
@@ -128,7 +134,8 @@ Sirve para los 3 roles.
   "email": "paciente@test.com",
   "role": "PATIENT",
   "createdAt": "2026-...",
-  "photoUrl": "/uploads/photos/<archivo>.jpg"
+  "photoUrl": "/uploads/photos/<archivo>.jpg",
+  "name": "Juan Perez"
 }
 ```
 
@@ -145,11 +152,12 @@ también en `GET /api/doctors`). Sirve para los 3 roles.
 - Tamaño máximo: `MAX_PHOTO_SIZE_MB` (default 2 MB)
 
 **Respuestas**
-| Status | Cuándo |
-|---|---|
-| 200 | Foto actualizada. Devuelve el usuario con el `photoUrl` nuevo |
-| 400 | Falta el archivo, formato no soportado, o excede el tamaño máximo |
-| 401 | Sin JWT |
+
+| Status | Cuándo                                                            |
+| ------ | ----------------------------------------------------------------- |
+| 200    | Foto actualizada. Devuelve el usuario con el `photoUrl` nuevo     |
+| 400    | Falta el archivo, formato no soportado, o excede el tamaño máximo |
+| 401    | Sin JWT                                                           |
 
 ```json
 // 200
@@ -158,7 +166,8 @@ también en `GET /api/doctors`). Sirve para los 3 roles.
   "email": "paciente@test.com",
   "role": "PATIENT",
   "createdAt": "2026-...",
-  "photoUrl": "/uploads/photos/<archivo>.jpg"
+  "photoUrl": "/uploads/photos/<archivo>.jpg",
+  "name": "Juan Perez"
 }
 ```
 
@@ -286,13 +295,14 @@ Crea una reserva para el paciente autenticado. Requiere JWT de rol **PATIENT**.
 - `endTime` debe ser posterior a `startTime` (validado por zod y por la BD)
 
 **Respuestas**
-| Status | Cuándo |
-|---|---|
-| 201 | Reserva creada |
-| 400 | Datos inválidos |
-| 401 | Sin JWT |
-| 403 | Rol distinto de PATIENT |
-| 409 | Horario ya reservado para ese doctor (superposición) |
+
+| Status | Cuándo                                               |
+| ------ | ---------------------------------------------------- |
+| 201    | Reserva creada                                       |
+| 400    | Datos inválidos                                      |
+| 401    | Sin JWT                                              |
+| 403    | Rol distinto de PATIENT                              |
+| 409    | Horario ya reservado para ese doctor (superposición) |
 
 ### `GET /api/appointments/mine`
 
@@ -340,12 +350,13 @@ Cancela una reserva. El `PATIENT` solo puede cancelar la propia; el `ADMIN` pued
 cualquiera.
 
 **Respuestas**
-| Status | Cuándo |
-|---|---|
-| 200 | Cancelada (status pasa a `CANCELLED`) |
-| 401 | Sin JWT |
-| 403 | PATIENT intentando cancelar la reserva de otro |
-| 404 | La reserva no existe |
+
+| Status | Cuándo                                         |
+| ------ | ---------------------------------------------- |
+| 200    | Cancelada (status pasa a `CANCELLED`)          |
+| 401    | Sin JWT                                        |
+| 403    | PATIENT intentando cancelar la reserva de otro |
+| 404    | La reserva no existe                           |
 
 ### `POST /api/appointments/:id/request-cancellation`
 
@@ -360,13 +371,14 @@ bloqueado, no se libera hasta que se apruebe). Requiere JWT de rol **DOCTOR**.
 ```
 
 **Respuestas**
-| Status | Cuándo |
-|---|---|
-| 201 | Pedido creado, `status: "pending"` |
-| 400 | La cita no está `CONFIRMED` (ya cancelada, o ya tiene un pedido pendiente) |
-| 403 | La cita pertenece a otro doctor |
-| 404 | La cita no existe |
-| 409 | Ya existe un pedido pendiente para esta cita (carrera concurrente) |
+
+| Status | Cuándo                                                                     |
+| ------ | -------------------------------------------------------------------------- |
+| 201    | Pedido creado, `status: "pending"`                                         |
+| 400    | La cita no está `CONFIRMED` (ya cancelada, o ya tiene un pedido pendiente) |
+| 403    | La cita pertenece a otro doctor                                            |
+| 404    | La cita no existe                                                          |
+| 409    | Ya existe un pedido pendiente para esta cita (carrera concurrente)         |
 
 ---
 
@@ -437,12 +449,13 @@ Registra un turno en la cola de hoy. Requiere JWT de rol **PATIENT**, **ADMIN**,
 - `priority`: `"normal"` (default) o `"preferente"`
 
 **Respuestas**
-| Status | Cuándo |
-|---|---|
-| 201 | Turno creado, con `number` correlativo del día |
-| 400 | La cita referenciada no pertenece a ese doctor, o no está `CONFIRMED` |
-| 404 | `appointmentId` no existe |
-| 409 | Esa cita **ya tiene** un turno de cola generado (doble check-in) |
+
+| Status | Cuándo                                                                |
+| ------ | --------------------------------------------------------------------- |
+| 201    | Turno creado, con `number` correlativo del día                        |
+| 400    | La cita referenciada no pertenece a ese doctor, o no está `CONFIRMED` |
+| 404    | `appointmentId` no existe                                             |
+| 409    | Esa cita **ya tiene** un turno de cola generado (doble check-in)      |
 
 ### `GET /api/queues/:doctorId`
 
@@ -520,14 +533,16 @@ Solo para **recibir** actualizaciones en tiempo real — todas las mutaciones va
 Escala horizontalmente entre múltiples instancias vía Redis Pub/Sub.
 
 **Cliente → Servidor**
-| type | payload | Efecto |
-|---|---|---|
-| `join-doctor-room` | `{ doctorId }` | Suscribe la conexión a las actualizaciones de ese doctor |
-| `leave-doctor-room` | `{ doctorId }` | Cancela la suscripción |
+
+| type                | payload        | Efecto                                                   |
+| ------------------- | -------------- | -------------------------------------------------------- |
+| `join-doctor-room`  | `{ doctorId }` | Suscribe la conexión a las actualizaciones de ese doctor |
+| `leave-doctor-room` | `{ doctorId }` | Cancela la suscripción                                   |
 
 **Servidor → Cliente**
-| type | payload | Se emite tras |
-|---|---|---|
-| `room-updated` | `{ doctorId, availability: Slot[] }` | Crear o cancelar una reserva de ese doctor |
-| `queue-updated` | `{ doctorId, date, currentTurn, waiting }` | check-in, `next`, `skip` o `call` |
-| `error` | `{ message }` | Mensaje mal formado o `doctorId` inexistente |
+
+| type            | payload                                    | Se emite tras                                |
+| --------------- | ------------------------------------------ | -------------------------------------------- |
+| `room-updated`  | `{ doctorId, availability: Slot[] }`       | Crear o cancelar una reserva de ese doctor   |
+| `queue-updated` | `{ doctorId, date, currentTurn, waiting }` | check-in, `next`, `skip` o `call`            |
+| `error`         | `{ message }`                              | Mensaje mal formado o `doctorId` inexistente |

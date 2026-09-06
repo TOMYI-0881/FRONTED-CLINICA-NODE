@@ -1,3 +1,4 @@
+import { UserAvatar } from "@/components/user/UserAvatar";
 import type { Turn } from "@/interfaces/queue.interface";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,11 @@ export const WaitingList = ({ waiting }: { waiting: Turn[] }) => {
             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground">
               {turn.number}
             </span>
+            <UserAvatar
+              name={turn.patientName}
+              photoUrl={turn.photoUrl}
+              className="size-8 shrink-0 rounded-full"
+            />
             <span className="truncate text-sm font-medium text-foreground">
               {turn.patientName}
             </span>

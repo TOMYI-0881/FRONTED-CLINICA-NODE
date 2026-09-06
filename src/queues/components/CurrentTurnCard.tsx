@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { UserAvatar } from "@/components/user/UserAvatar";
 import type { Turn } from "@/interfaces/queue.interface";
 import { cn } from "@/lib/utils";
 import { UserRound } from "lucide-react";
@@ -7,9 +8,17 @@ export const CurrentTurnCard = ({ turn }: { turn: Turn | null }) => {
   return (
     <Card className={cn(turn ? "ring-2 ring-primary" : "ring-1 ring-border")}>
       <CardContent className="flex items-center gap-4 py-2">
-        <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <UserRound size={26} />
-        </div>
+        {turn ? (
+          <UserAvatar
+            name={turn.patientName}
+            photoUrl={turn.photoUrl}
+            className="size-14 shrink-0 rounded-full ring-2 ring-primary"
+          />
+        ) : (
+          <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <UserRound size={26} />
+          </div>
+        )}
         {turn ? (
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
