@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/auth/store/auth.store";
@@ -24,9 +24,15 @@ export const BookingPage = () => {
   const bookMutation = useBookAppointment(doctorId, date);
 
   const authStatus = useAuthStore((state) => state.authStatus);
-  const isPatient = useAuthStore((state) => state.user?.role === "PATIENT");
+  const role = useAuthStore((state) => state.user?.role);
+  const isPatient = role === "PATIENT";
 
   const canBook = authStatus === "authenticated" && isPatient;
+
+  // Un DOCTOR o ADMIN nunca puede reservarle un turno a otro doctor:
+  // ni siquiera debería ver esta pantalla, no solo tener el botón bloqueado.
+  if (role === "DOCTOR") return <Navigate to="/doctor/queue" />;
+  if (role === "ADMIN") return <Navigate to="/admin" />;
 
   const handleDateChange = (newDate: string) => {
     setDate(newDate);
@@ -96,16 +102,10 @@ export const BookingPage = () => {
             </Button>
           ) : (
             <div className="rounded-md border border-dashed border-border p-3 text-center text-sm text-muted-foreground">
-              {authStatus === "authenticated" ? (
-                "Solo los pacientes pueden reservar turnos."
-              ) : (
-                <>
-                  Iniciá sesión como paciente para reservar.{" "}
-                  <Link to="/auth/login" className="font-medium text-primary underline">
-                    Iniciar sesión
-                  </Link>
-                </>
-              )}
+              Iniciá sesión como paciente para reservar.{" "}
+              <Link to="/auth/login" className="font-medium text-primary underline">
+                Iniciar sesión
+              </Link>
             </div>
           )}
         </CardContent>

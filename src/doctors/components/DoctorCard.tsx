@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useAuthStore } from "@/auth/store/auth.store";
 import type { Doctor } from "@/interfaces/doctor.interface";
 import { CalendarPlus, Radio, Stethoscope } from "lucide-react";
 import { Link } from "react-router";
@@ -9,6 +10,10 @@ interface Props {
 }
 
 export const DoctorCard = ({ doctor }: Props) => {
+  const role = useAuthStore((state) => state.user?.role);
+  // Un DOCTOR o ADMIN no reserva turnos con otros doctores.
+  const canBook = role !== "DOCTOR" && role !== "ADMIN";
+
   return (
     <Card className="ring-1 ring-border">
       <CardContent className="flex items-start gap-4">
@@ -25,14 +30,16 @@ export const DoctorCard = ({ doctor }: Props) => {
         </div>
       </CardContent>
       <CardFooter className="flex gap-2 bg-transparent border-t-0 px-4 pb-4 pt-0">
-        <Link to={`/doctors/${doctor.id}`} className="flex-1">
-          <Button className="w-full" size="sm">
-            <CalendarPlus className="size-4" />
-            Reservar turno
-          </Button>
-        </Link>
-        <Link to={`/doctors/${doctor.id}/queue`}>
-          <Button variant="outline" size="sm">
+        {canBook && (
+          <Link to={`/doctors/${doctor.id}`} className="flex-1">
+            <Button className="w-full" size="sm">
+              <CalendarPlus className="size-4" />
+              Reservar turno
+            </Button>
+          </Link>
+        )}
+        <Link to={`/doctors/${doctor.id}/queue`} className={canBook ? undefined : "flex-1"}>
+          <Button variant="outline" size="sm" className={canBook ? undefined : "w-full"}>
             <Radio className="size-4" />
             Cola en vivo
           </Button>
