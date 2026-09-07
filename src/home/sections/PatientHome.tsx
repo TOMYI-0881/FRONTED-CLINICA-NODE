@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import { useDoctors } from "@/doctors/hooks/useDoctors";
 import { OfferSection } from "../components/OfferSection";
 import { SearchBar } from "../components/SearchBar";
@@ -9,8 +10,23 @@ const ALL_SPECIALTIES = "Todas las especialidades";
 export const PatientHome = () => {
   const { data: doctors, isLoading } = useDoctors();
 
-  const [query, setQuery] = useState("");
   const [specialty, setSpecialty] = useState(ALL_SPECIALTIES);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("query") ?? "";
+  const setQuery = (value: string) => {
+    setSearchParams(
+      (prev) => {
+        if (value.trim()) {
+          prev.set("query", value);
+        } else {
+          prev.delete("query");
+        }
+        return prev;
+      },
+      { replace: true },
+    );
+  };
 
   useEffect(() => {
     document.title = "Reservá tu turno | Tomy Salud";

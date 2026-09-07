@@ -1,3 +1,8 @@
+import { useRef, useState } from "react";
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+} from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Stethoscope } from "lucide-react";
 import { ProfessionalCard } from "./ProfessionalCard";
@@ -9,7 +14,64 @@ interface Props {
   isLoading: boolean;
 }
 
+const CARD_STEP_PX = 256; // 240px de tarjeta + 16px de gap
+
 export const ProfessionalsSection = ({ doctors, count, isLoading }: Props) => {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{
+    startX: number;
+    startInnerX: number;
+    moved: boolean;
+  } | null>(null);
+  const [innerX, setInnerX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [paused, setPaused] = useState(false);
+
+  const animationPlayState = dragging || paused ? "paused" : "running";
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const track = trackRef.current;
+    if (!track || doctors.length < 2) return;
+    dragRef.current = {
+      startX: event.clientX,
+      startInnerX: innerX,
+      moved: false,
+    };
+    setDragging(true);
+    track.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    const dx = event.clientX - drag.startX;
+    if (Math.abs(dx) > 3) drag.moved = true;
+    if (drag.moved) setInnerX(drag.startInnerX + dx);
+  };
+
+  const endDrag = () => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    const hadDrag = drag.moved;
+    dragRef.current = null;
+    setDragging(false);
+    if (!hadDrag) return;
+    // Si hubo arrastre, el click de liberacion que sigue no debe navegar.
+    trackRef.current?.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      },
+      { capture: true, once: true },
+    );
+  };
+
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "ArrowLeft") setInnerX((value) => value - CARD_STEP_PX);
+    if (event.key === "ArrowRight") setInnerX((value) => value + CARD_STEP_PX);
+  };
+
   return (
     <section id="profesionales" className="mt-8 scroll-mt-24">
       <div className="mb-5 flex items-end justify-between gap-4">
@@ -39,18 +101,41 @@ export const ProfessionalsSection = ({ doctors, count, isLoading }: Props) => {
       ) : doctors.length > 0 ? (
         doctors.length >= 2 ? (
           <div
-            className="group/row overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_2rem,black_calc(100%-2rem),transparent)]"
+            ref={trackRef}
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            onKeyDown={handleKeyDown}
+            tabIndex={0}
             aria-label="Carrusel de profesionales"
+            className="cursor-grab touch-pan-y select-none overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_2rem,black_calc(100%-2rem),transparent)] active:cursor-grabbing"
           >
             <div
-              className="flex w-max animate-marquee gap-4 group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused]"
-              style={{ animationDuration: `${doctors.length * 6.4}s` }}
+              className="flex w-max animate-marquee"
+              style={{
+                animationDuration: `${doctors.length * 6.4}s`,
+                animationPlayState,
+              }}
             >
-              {[...doctors, ...doctors].map((doctor, index) => (
-                <div key={`${doctor.id}-${index}`} className="w-[240px] shrink-0">
-                  <ProfessionalCard doctor={doctor} index={index % doctors.length} />
-                </div>
-              ))}
+              <div
+                className="flex gap-4"
+                style={{ transform: `translateX(${innerX}px)` }}
+              >
+                {[...doctors, ...doctors].map((doctor, index) => (
+                  <div
+                    key={`${doctor.id}-${index}`}
+                    className="w-[240px] shrink-0"
+                  >
+                    <ProfessionalCard
+                      doctor={doctor}
+                      index={index % doctors.length}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         ) : (

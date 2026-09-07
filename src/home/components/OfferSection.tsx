@@ -54,7 +54,9 @@ export const OfferSection = () => {
   const currentOffer = offers[slide];
 
   const moveSlide = (direction: number) => {
-    setSlide((current) => (current + direction + offers.length) % offers.length);
+    setSlide(
+      (current) => (current + direction + offers.length) % offers.length,
+    );
   };
 
   return (
@@ -134,10 +136,7 @@ export const OfferSection = () => {
         </div>
       </div>
 
-      <a
-        href="#profesionales"
-        className="group relative flex min-h-48 flex-col justify-between overflow-hidden rounded-[22px] border border-frost-edge bg-card p-5 shadow-sm backdrop-blur-xl transition-colors hover:bg-card/90 md:row-span-2"
-      >
+      <a className="cursor-pointer group relative flex min-h-48 flex-col justify-between overflow-hidden rounded-[22px] border border-frost-edge bg-card p-5 shadow-sm backdrop-blur-xl transition-colors hover:bg-card/90 md:row-span-2">
         <div>
           <span className="grid size-11 place-items-center rounded-xl bg-coral/15 text-coral">
             <FileText />
@@ -153,13 +152,14 @@ export const OfferSection = () => {
           </p>
         </div>
         <span className="mt-8 inline-flex items-center gap-1 text-sm font-bold text-coral">
-          Abrir <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+          Abrir{" "}
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
         </span>
       </a>
 
       <a
-        href="#ayuda"
-        className="flex items-center justify-between rounded-[22px] border border-frost-edge bg-card p-5 shadow-sm backdrop-blur-xl transition-colors hover:bg-card/90 md:col-span-2"
+        // href="#ayuda"
+        className="cursor-pointer flex items-center justify-between rounded-[22px] border border-frost-edge bg-card p-5 shadow-sm backdrop-blur-xl transition-colors hover:bg-card/90 md:col-span-2"
       >
         <div>
           <p className="text-xs font-bold uppercase text-primary">Urgencias</p>
@@ -170,8 +170,8 @@ export const OfferSection = () => {
         </span>
       </a>
       <a
-        href="#profesionales"
-        className="flex items-center justify-between rounded-[22px] border border-frost-edge bg-card p-5 shadow-sm backdrop-blur-xl transition-colors hover:bg-card/90"
+        // href="#profesionales"
+        className="cursor-pointer flex items-center justify-between rounded-[22px] border border-frost-edge bg-card p-5 shadow-sm backdrop-blur-xl transition-colors hover:bg-card/90"
       >
         <div>
           <p className="text-xs font-bold uppercase text-primary">Vacunas</p>
