@@ -17,6 +17,11 @@ interface TurnAlert {
   doctorName: string;
 }
 
+// Id fijo: atar la vida del toast a la del overlay (se cierra con "Entendido").
+const TURN_TOAST_ID = "my-turn-alert";
+// Tras confirmar el overlay ("Entendido") el toast permanece unos segundos más.
+const TOAST_EXTRA_MS = 5000;
+
 // Dos tonos ascendentes cortos (tipo "llamado"). Si el navegador bloquea el
 // audio por políticas de autoplay, falla en silencio sin romper el flujo.
 const playCallSound = () => {
@@ -158,6 +163,7 @@ const PatientTurnWatcher = () => {
   const { data: myAppointments } = useMyAppointments();
   const { data: doctors } = useDoctors();
   const [alert, setAlert] = useState<TurnAlert | null>(null);
+  const dismissToastRef = useRef<number | null>(null);
 
   const today = todayApiDate();
   const todaysAppointments = (myAppointments ?? []).filter(
@@ -167,30 +173,18 @@ const PatientTurnWatcher = () => {
 
   useEffect(() => {
     if (!alert) return;
+    // Un cierre diferido pendiente de un aviso anterior no debe matar el toast recien creado.
+    if (dismissToastRef.current !== null) {
+      window.clearTimeout(dismissToastRef.current);
+      dismissToastRef.current = null;
+    }
     const previousTitle = document.title;
     document.title = "¡Es tu turno!";
     playCallSound();
-    return () => {
-      document.title = previousTitle;
-    };
-  }, [alert]);
-
-  const handleTurnStarted = (turn: Turn) => {
-    const apt = todaysAppointments.find((a) => a.id === turn.appointmentId);
-    if (!apt) return;
-    const doctorName =
-      doctors?.find((d) => d.id === apt.doctorId)?.name ?? "tu médico";
-
-    setAlert({
-      appointmentId: apt.id,
-      turnNumber: turn.number,
-      doctorId: apt.doctorId,
-      doctorName,
-    });
-
     toast("Es tu turno", {
-      description: `Turno #${turn.number} · ${doctorName}. Ya podés pasar al consultorio.`,
-      duration: Number.POSITIVE_INFINITY,
+      id: TURN_TOAST_ID,
+      description: `Turno #${alert.turnNumber} · ${alert.doctorName}. Ya podés pasar al consultorio.`,
+      duration: 15_000,
       style: {
         "--normal-bg": "oklch(0.62 0.19 28)",
         "--normal-text": "#ffffff",
@@ -203,12 +197,49 @@ const PatientTurnWatcher = () => {
         color: "oklch(0.62 0.19 28)",
         fontWeight: 700,
       },
+      cancelButtonStyle: {
+        background: "rgba(255,255,255,0.16)",
+        border: "1px solid rgba(255,255,255,0.4)",
+        color: "#ffffff",
+        fontWeight: 600,
+      },
       action: {
         label: "Abrir cola",
         onClick: () => {
-          window.location.assign(`/doctors/${apt.doctorId}/queue`);
+          window.location.assign(`/doctors/${alert.doctorId}/queue`);
         },
       },
+      cancel: {
+        label: "Cerrar",
+        onClick: () => toast.dismiss(TURN_TOAST_ID),
+      },
+    });
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [alert]);
+
+  const handleDismiss = () => {
+    setAlert(null);
+    if (dismissToastRef.current === null) {
+      dismissToastRef.current = window.setTimeout(() => {
+        toast.dismiss(TURN_TOAST_ID);
+        dismissToastRef.current = null;
+      }, TOAST_EXTRA_MS);
+    }
+  };
+
+  const handleTurnStarted = (turn: Turn) => {
+    const apt = todaysAppointments.find((a) => a.id === turn.appointmentId);
+    if (!apt) return;
+    const doctorName =
+      doctors?.find((d) => d.id === apt.doctorId)?.name ?? "tu médico";
+
+    setAlert({
+      appointmentId: apt.id,
+      turnNumber: turn.number,
+      doctorId: apt.doctorId,
+      doctorName,
     });
   };
 
@@ -224,7 +255,7 @@ const PatientTurnWatcher = () => {
       ))}
 
       <AnimatePresence>
-        {alert && <TurnAlertOverlay alert={alert} onDismiss={() => setAlert(null)} />}
+        {alert && <TurnAlertOverlay alert={alert} onDismiss={handleDismiss} />}
       </AnimatePresence>
     </>
   );

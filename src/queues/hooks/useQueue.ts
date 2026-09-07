@@ -27,25 +27,33 @@ export const useQueue = (doctorId: string | undefined, date: string) => {
         message.payload.doctorId === doctorId &&
         message.payload.date === date
       ) {
-        // El broadcast WS no incluye myTurn (es por-paciente); se conserva del
-        // último estado si el turno propio sigue en curso o en espera.
+        // El broadcast WS no incluye myTurn (es por-paciente); se re-sincroniza del
+        // estado fresco cuando el turno propio sigue en curso o en espera. Adoptar
+        // el objeto del payload (y no el del cache) es clave para que notify/alertas
+        // vean el status real (p.ej. "waiting" -> "in-progress") sin esperar al REST.
         queryClient.setQueryData<QueueState>(queryKey, (old) => {
+          const current = message.payload.currentTurn;
+          const waiting = message.payload.waiting;
           const mine = old?.myTurn ?? null;
-          const stillThere =
-            !!mine &&
-            (message.payload.currentTurn?.id === mine.id ||
-              message.payload.waiting.some((turn) => turn.id === mine.id));
-          return {
-            current: message.payload.currentTurn,
-            waiting: message.payload.waiting,
-            myTurn: stillThere ? mine : null,
-          };
+          const myTurn = mine
+            ? current?.id === mine.id
+              ? current
+              : waiting.find((turn) => turn.id === mine.id) ?? null
+            : null;
+          return { current, waiting, myTurn };
         });
       }
     });
 
+    // Auto-reparacion: si el socket se cayo y vuelve, refetch de las colas para no
+    // quedar dependiendo del proximo poll REST (el WS re-une las salas en onopen).
+    const unsubscribeConnect = clinicSocket.subscribeConnect(() => {
+      queryClient.invalidateQueries({ queryKey: ["queue"] });
+    });
+
     return () => {
       unsubscribe();
+      unsubscribeConnect();
       clinicSocket.leaveRoom(doctorId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
