@@ -29,9 +29,18 @@ export const ProfessionalsSection = ({ doctors, count, isLoading }: Props) => {
 
   const animationPlayState = dragging || paused ? "paused" : "running";
 
+  const isInteractiveTarget = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return false;
+    return (
+      target.closest("a, button, input, textarea, select, [role='button']") !==
+      null
+    );
+  };
+
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     const track = trackRef.current;
     if (!track || doctors.length < 2) return;
+    if (isInteractiveTarget(event.target)) return;
     dragRef.current = {
       startX: event.clientX,
       startInnerX: innerX,
