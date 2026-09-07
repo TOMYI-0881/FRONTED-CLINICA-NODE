@@ -4,6 +4,7 @@ import { appRouter } from "./router/app.Router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { MyTurnNotification } from "@/queues/components/MyTurnNotification";
 import { useEffect, useState, type PropsWithChildren } from "react";
 import { AppLoader } from "./layout/components/AppLoader";
@@ -37,14 +38,16 @@ const CheckAuthProvider = ({ children }: PropsWithChildren) => {
 };
 
 export const ClinicApp = () => (
-  <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <MyTurnNotification />
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <Toaster />
+      <MyTurnNotification />
 
-    <CheckAuthProvider>
-      <RouterProvider router={appRouter} />
-    </CheckAuthProvider>
+      <CheckAuthProvider>
+        <RouterProvider router={appRouter} />
+      </CheckAuthProvider>
 
-    <ReactQueryDevtools initialIsOpen={false} />
-  </QueryClientProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  </ErrorBoundary>
 );

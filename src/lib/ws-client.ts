@@ -17,8 +17,25 @@ export type ServerMessage =
 type Listener = (message: ServerMessage) => void;
 type ConnectListener = () => void;
 
-const WS_URL = import.meta.env.VITE_WS_URL as string;
 const MAX_RECONNECT_DELAY_MS = 15000;
+
+// VITE_WS_URL se declara con http/https (mismo host que la API); WebSocket exige
+// ws/wss, así que se normaliza el esquema y se valida que la URL sea usable. Si
+// falta o es inválida (p.ej. no se definió en el build de producción), el socket
+// se desactiva en silencio y la app sigue funcionando por REST.
+const WS_URL = (() => {
+  const raw = import.meta.env.VITE_WS_URL as string | undefined;
+  if (!raw) return null;
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol === "http:") parsed.protocol = "ws:";
+    if (parsed.protocol === "https:") parsed.protocol = "wss:";
+    if (parsed.protocol !== "ws:" && parsed.protocol !== "wss:") return null;
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+})();
 
 // El WS es solo de lectura (join/leave de salas por doctor) y de un único
 // socket global reutilizado por todos los hooks que necesiten disponibilidad
@@ -40,7 +57,15 @@ class ClinicSocket {
       return;
     }
 
-    const socket = new WebSocket(WS_URL);
+    if (!WS_URL) return;
+
+    let socket: WebSocket;
+    try {
+      socket = new WebSocket(WS_URL);
+    } catch {
+      // WS no disponible: no se conecta ni se reintenta; la app sigue por REST.
+      return;
+    }
     this.ws = socket;
 
     socket.onopen = () => {
