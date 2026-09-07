@@ -1,0 +1,11 @@
+[build]
+  command = "pnpm install --frozen-lockfile && pnpm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[context.production.environment]
+  NODE_VERSION = "22"
+  VITE_API_URL = "https://backend-clinica-node.onrender.com/api"
+  VITE_WS_URL = "wss://backend-clinica-node.onrender.com/ws"
