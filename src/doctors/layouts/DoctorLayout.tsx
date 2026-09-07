@@ -1,5 +1,5 @@
 import { Link, Outlet, ScrollRestoration, useLocation } from "react-router";
-import { CalendarClock, LogOut, Radio, UserRound } from "lucide-react";
+import { CalendarClock, ChevronRight, LogOut, Radio, UserRound } from "lucide-react";
 import { CustomLogo } from "@/components/custom/CustomLogo";
 import { useAuthStore } from "@/auth/store/auth.store";
 import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
@@ -47,21 +47,30 @@ const DoctorLayout = () => {
         </nav>
       </header>
 
-      <div className="border-b border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground lg:px-8">
+      <div className="border-b border-frost-edge bg-gradient-to-r from-coral-light/50 via-frost to-transparent px-4 py-2 lg:px-8">
         <Link
           to="/doctor/profile"
-          className="group inline-flex items-center gap-2"
+          className="group inline-flex items-center gap-3 rounded-xl px-1.5 py-1 transition-colors hover:bg-card/70"
           title="Mi perfil"
         >
-          <DoctorAvatar
-            name={user?.name ?? user?.email ?? ""}
-            photoUrl={user?.photoUrl ?? null}
-            className="size-8 rounded-full border border-border bg-background"
-            initialsClassName="text-xs"
-          />
-          <span className="font-medium text-foreground group-hover:underline">
-            {user?.email}
+          <span className="relative shrink-0">
+            <DoctorAvatar
+              name={user?.name ?? user?.email ?? ""}
+              photoUrl={user?.photoUrl ?? null}
+              className="size-9 rounded-full ring-2 ring-coral/60"
+              initialsClassName="text-xs"
+            />
+            <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-coral ring-2 ring-background" />
           </span>
+          <span className="grid min-w-0 gap-0.5">
+            <span className="truncate text-xs font-semibold text-foreground group-hover:underline">
+              {user?.name ?? user?.email}
+            </span>
+            <span className="truncate text-[0.7rem] text-muted-foreground">
+              {user?.email}
+            </span>
+          </span>
+          <ChevronRight className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
         </Link>
       </div>
 

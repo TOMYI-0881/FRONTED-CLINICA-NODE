@@ -64,7 +64,8 @@ export const AdminAppointmentsPage = () => {
                   <AppointmentStatusBadge status={appointment.status} />
                 </TableCell>
                 <TableCell>
-                  {appointment.status !== "CANCELLED" && (
+                  {appointment.status !== "CANCELLED" &&
+                    appointment.status !== "COMPLETED" && (
                     <Button
                       variant="ghost"
                       size="icon-sm"

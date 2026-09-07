@@ -1,6 +1,8 @@
+import { useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { CalendarClock, UserRound } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserAvatar } from "@/components/user/UserAvatar";
 import { cn } from "@/lib/utils";
 import type { Turn, TurnPriority, TurnStatus } from "@/interfaces/queue.interface";
 
@@ -22,7 +24,25 @@ const statusClass: Record<string, string> = {
   preferente: "bg-amber-500/10 text-amber-600",
 };
 
+const CARD_WIDTH = 220;
+const CARD_GAP = 16;
+
 export const DoctorPatientsCarousel = ({ turns, isLoading }: Props) => {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    const element = rowRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setContainerWidth(entry.contentRect.width);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex gap-4 overflow-hidden">
@@ -44,32 +64,63 @@ export const DoctorPatientsCarousel = ({ turns, isLoading }: Props) => {
     );
   }
 
-  if (turns.length < 2) {
-    return (
-      <div className="flex gap-4">
-        <TurnCard turn={turns[0]} />
-      </div>
-    );
-  }
+  const setWidth = turns.length * CARD_WIDTH + (turns.length - 1) * CARD_GAP;
+
+  const shouldMarquee = containerWidth > 0 && setWidth > containerWidth;
 
   return (
     <div
-      className="group/row overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_2rem,black_calc(100%-2rem),transparent)]"
-      aria-label="Carrusel de pacientes de hoy"
+      ref={rowRef}
+      className={
+        shouldMarquee
+          ? "group/row overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_2rem,black_calc(100%-2rem),transparent)]"
+          : "flex gap-4 overflow-x-auto overscroll-x-contain pb-1"
+      }
+      aria-label="Pacientes de hoy"
     >
-      <div
-        className="flex w-max animate-marquee gap-4 group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused]"
-        style={{ animationDuration: `${turns.length * 5.2}s` }}
-      >
-        {[...turns, ...turns].map((turn, index) => (
-          <div key={`${turn.id}-${index}`} className="w-[220px] shrink-0">
-            <TurnCard turn={turn} index={index % turns.length} />
+      {shouldMarquee ? (
+        <div
+          className="flex w-max animate-marquee group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused]"
+          style={{
+            animationDuration: `${turns.length * 5.2}s`,
+            animationDirection: "alternate",
+          }}
+        >
+          <MarqueeSet turns={turns} />
+          <MarqueeSet turns={turns} ariaHidden />
+        </div>
+      ) : (
+        turns.map((turn, index) => (
+          <div key={turn.id} className="w-[220px] shrink-0">
+            <TurnCard turn={turn} index={index} />
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
   );
 };
+
+// Una "vuelta" completa de la marquesina: copia idéntica de las tarjetas con un
+// espaciado final más amplio para marcar el punto de reinicio, evitando que la
+// información se perciba como duplicada y que el -50% del @keyframes desfase el loop.
+const MarqueeSet = ({
+  turns,
+  ariaHidden = false,
+}: {
+  turns: Turn[];
+  ariaHidden?: boolean;
+}) => (
+  <div
+    aria-hidden={ariaHidden || undefined}
+    className="flex shrink-0 items-stretch gap-4 pr-16"
+  >
+    {turns.map((turn, index) => (
+      <div key={turn.id} className="w-[220px] shrink-0">
+        <TurnCard turn={turn} index={index} />
+      </div>
+    ))}
+  </div>
+);
 
 interface CardProps {
   turn: Turn;
@@ -106,11 +157,13 @@ const TurnCard = ({ turn, index = 0 }: CardProps) => {
         </span>
       </div>
 
-      <div className="mt-3 grid aspect-square w-full place-items-center rounded-2xl bg-coral-light/60">
-        <span className="grid size-12 place-items-center rounded-full bg-surface text-coral shadow-sm">
-          <UserRound className="size-6" />
-        </span>
-      </div>
+      <UserAvatar
+        name={turn.patientName}
+        photoUrl={turn.photoUrl}
+        className="mt-3 size-44 w-full rounded-2xl object-cover"
+        initialsClassName="rounded-2xl bg-coral-light/60 text-coral text-lg"
+        alt={`Foto de ${turn.patientName}`}
+      />
 
       <div className="px-1 pb-1 pt-3">
         <h3 className="truncate font-display text-base font-bold">{turn.patientName}</h3>

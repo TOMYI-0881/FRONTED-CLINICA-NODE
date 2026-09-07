@@ -4,6 +4,7 @@ import { appRouter } from "./router/app.Router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
+import { MyTurnNotification } from "@/queues/components/MyTurnNotification";
 import { useEffect, type PropsWithChildren } from "react";
 import { AppLoader } from "./layout/components/AppLoader";
 import { useAuthStore } from "@/auth/store/auth.store";
@@ -32,6 +33,7 @@ const CheckAuthProvider = ({ children }: PropsWithChildren) => {
 export const ClinicApp = () => (
   <QueryClientProvider client={queryClient}>
     <Toaster />
+    <MyTurnNotification />
 
     <CheckAuthProvider>
       <RouterProvider router={appRouter} />

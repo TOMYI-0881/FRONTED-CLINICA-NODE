@@ -12,13 +12,20 @@ export const QueueControls = ({ doctorId, currentTurn }: Props) => {
   const { next, skip, call } = useQueueControls(doctorId);
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button onClick={() => next.mutate()} disabled={next.isPending}>
+    <div className="grid gap-2 sm:grid-cols-3">
+      <Button
+        size="lg"
+        className="rounded-full py-2.5"
+        onClick={() => next.mutate()}
+        disabled={next.isPending}
+      >
         <StepForward className="size-4" />
         Siguiente
       </Button>
       <Button
         variant="outline"
+        size="lg"
+        className="rounded-full py-2.5"
         onClick={() => skip.mutate()}
         disabled={skip.isPending}
       >
@@ -26,7 +33,9 @@ export const QueueControls = ({ doctorId, currentTurn }: Props) => {
         Saltar
       </Button>
       <Button
-        variant="outline"
+        variant="frost"
+        size="lg"
+        className="rounded-full py-2.5"
         onClick={() => call.mutate()}
         disabled={!currentTurn || call.isPending}
       >

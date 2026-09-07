@@ -1,7 +1,8 @@
 export type AppointmentStatus =
   | "CONFIRMED"
   | "CANCELLATION_REQUESTED"
-  | "CANCELLED";
+  | "CANCELLED"
+  | "COMPLETED";
 
 export interface Appointment {
   id: string;
