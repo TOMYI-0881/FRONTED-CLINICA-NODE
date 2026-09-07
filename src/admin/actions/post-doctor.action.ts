@@ -1,9 +1,10 @@
 import { clinicApi } from "@/api/clinicApi";
-import type { Doctor } from "@/interfaces/doctor.interface";
+import type { Doctor, DoctorGender } from "@/interfaces/doctor.interface";
 
 interface CreateDoctorInput {
   name: string;
   specialty: string;
+  gender: DoctorGender;
   email: string;
   password: string;
 }

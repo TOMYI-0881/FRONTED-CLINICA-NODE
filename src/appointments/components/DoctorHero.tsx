@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
 import { getDoctorProfile } from "@/home/lib/mock-images";
 import { formatDateLocal } from "@/lib/format-date";
+import { formatDoctorName } from "@/lib/format-doctor-name";
 import { CalendarDays, Clock3, MapPin, Radio, Stethoscope } from "lucide-react";
 import type { Doctor } from "@/interfaces/doctor.interface";
 
@@ -41,7 +42,7 @@ export const DoctorHero = ({ doctor, showLiveCta = true }: Props) => {
             {doctor.specialty}
           </span>
           <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-foreground">
-            {doctor.name}
+            {formatDoctorName(doctor)}
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
             {place && (

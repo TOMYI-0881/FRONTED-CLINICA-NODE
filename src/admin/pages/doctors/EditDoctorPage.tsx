@@ -4,12 +4,16 @@ import { ArrowLeft, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useDoctors } from "@/doctors/hooks/useDoctors";
 import { useDoctorsAdmin } from "@/admin/hooks/useDoctorsAdmin";
 import { useDoctorPhoto } from "@/admin/hooks/useDoctorPhoto";
 import { getDoctorProfile } from "@/home/lib/mock-images";
 import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
 import { PhotoUploader } from "@/components/photo/PhotoUploader";
+import { cn } from "@/lib/utils";
+import { formatDoctorName } from "@/lib/format-doctor-name";
+import type { DoctorGender } from "@/interfaces/doctor.interface";
 
 export const EditDoctorPage = () => {
   const { doctorId } = useParams<{ doctorId: string }>();
@@ -22,6 +26,7 @@ export const EditDoctorPage = () => {
 
   const [name, setName] = useState(doctor?.name ?? "");
   const [specialty, setSpecialty] = useState(doctor?.specialty ?? "");
+  const [gender, setGender] = useState<DoctorGender>(doctor?.gender ?? "male");
 
   if (isLoading) return <h1 className="p-8">Cargando...</h1>;
 
@@ -51,7 +56,7 @@ export const EditDoctorPage = () => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     update.mutate(
-      { id: doctor.id, name, specialty },
+      { id: doctor.id, name, specialty, gender },
       { onSuccess: () => navigate("/admin/doctors") },
     );
   };
@@ -78,7 +83,7 @@ export const EditDoctorPage = () => {
             Editar doctor
           </p>
           <h1 className="mt-1 font-display text-2xl font-extrabold">
-            {doctor.name}
+            {formatDoctorName(doctor)}
           </h1>
           {place && (
             <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
@@ -96,7 +101,7 @@ export const EditDoctorPage = () => {
         </p>
         <div className="mt-4">
           <PhotoUploader
-            name={doctor.name}
+            name={formatDoctorName(doctor)}
             photoUrl={doctor.photoUrl}
             size={128}
             pending={photoPending}
@@ -132,6 +137,40 @@ export const EditDoctorPage = () => {
               onChange={(event) => setSpecialty(event.target.value)}
               required
             />
+          </div>
+          <div>
+            <Label htmlFor="gender" className="mb-2">
+              Tratamiento del nombre
+            </Label>
+            <RadioGroup
+              id="gender"
+              value={gender}
+              onValueChange={(value) => setGender(value as DoctorGender)}
+              className="flex flex-row gap-3"
+            >
+              <label
+                className={cn(
+                  "flex flex-1 cursor-pointer items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors",
+                  gender === "male"
+                    ? "border-primary bg-primary/5"
+                    : "border-frost-edge bg-surface/50",
+                )}
+              >
+                <RadioGroupItem value="male" />
+                Dr.
+              </label>
+              <label
+                className={cn(
+                  "flex flex-1 cursor-pointer items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors",
+                  gender === "female"
+                    ? "border-primary bg-primary/5"
+                    : "border-frost-edge bg-surface/50",
+                )}
+              >
+                <RadioGroupItem value="female" />
+                Dra.
+              </label>
+            </RadioGroup>
           </div>
         </div>
 

@@ -7,6 +7,7 @@ import { useMyAppointments } from "@/appointments/hooks/useMyAppointments";
 import { useDoctors } from "@/doctors/hooks/useDoctors";
 import { useQueue } from "@/queues/hooks/useQueue";
 import { todayApiDate } from "@/lib/format-date";
+import { formatDoctorName } from "@/lib/format-doctor-name";
 import { Radio } from "lucide-react";
 import type { Turn } from "@/interfaces/queue.interface";
 
@@ -125,7 +126,14 @@ const QueueWatcher = ({
   const today = todayApiDate();
   const { data: queue } = useQueue(doctorId, today);
   const notifiedRef = useRef(false);
-  const mine = queue?.myTurn;
+  // El turno propio se deriva del estado en vivo (current/waiting), que el WS
+  // refresca SIEMPRE desde el broadcast. No depende de que myTurn ya esté en
+  // caché: un turno creado por check-in de admin/doctor dispara el aviso igual.
+  const mine =
+    queue?.current?.appointmentId === appointmentId
+      ? queue.current
+      : queue?.waiting.find((turn) => turn.appointmentId === appointmentId) ??
+        null;
 
   useEffect(() => {
     const isMine =
@@ -232,8 +240,8 @@ const PatientTurnWatcher = () => {
   const handleTurnStarted = (turn: Turn) => {
     const apt = todaysAppointments.find((a) => a.id === turn.appointmentId);
     if (!apt) return;
-    const doctorName =
-      doctors?.find((d) => d.id === apt.doctorId)?.name ?? "tu médico";
+    const doctor = doctors?.find((d) => d.id === apt.doctorId);
+    const doctorName = doctor ? formatDoctorName(doctor) : "tu médico";
 
     setAlert({
       appointmentId: apt.id,

@@ -48,18 +48,18 @@ const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
       )}
 
       <aside
-        className={`shrink-0 bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300
+        className={`shrink-0 bg-card/70 backdrop-blur-xl border-r border-frost-edge flex flex-col transition-all duration-300
           fixed md:relative inset-y-0 left-0 z-40
           ${collapsed ? "w-16" : "w-64"}
           ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
-        <div className="h-16 px-4 border-b border-sidebar-border flex items-center justify-between">
+        <div className="h-16 px-4 border-b border-frost-edge flex items-center justify-between">
           {!collapsed && <CustomLogo subtitle="Admin" />}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCollapsed((c) => !c)}
-              className="hidden md:flex p-1.5 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+              className="hidden md:flex p-1.5 rounded-lg text-muted-foreground hover:bg-frost hover:text-foreground transition-colors"
               aria-label="Alternar barra lateral"
             >
               {collapsed ? (
@@ -70,7 +70,7 @@ const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
             </button>
             <button
               onClick={onClose}
-              className="md:hidden p-1.5 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+              className="md:hidden p-1.5 rounded-lg text-muted-foreground hover:bg-frost hover:text-foreground transition-colors"
               aria-label="Cerrar barra lateral"
             >
               <X size={18} />
@@ -86,10 +86,10 @@ const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
                 <li key={item.label}>
                   <Link
                     to={item.to}
-                    className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
+                    className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${
                       isActiveRoute(item.to)
                         ? "bg-primary text-white"
-                        : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                        : "text-muted-foreground hover:bg-frost hover:text-foreground"
                     }`}
                   >
                     <Icon size={18} className="shrink-0" />
@@ -104,8 +104,8 @@ const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
         </nav>
 
         {!collapsed && (
-          <div className="p-3 border-t border-sidebar-border">
-            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-accent transition-colors cursor-pointer">
+          <div className="p-3 border-t border-frost-edge">
+            <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-frost transition-colors cursor-pointer">
               <DoctorAvatar
                 name={user?.name || user?.email || ""}
                 photoUrl={user?.photoUrl ?? null}

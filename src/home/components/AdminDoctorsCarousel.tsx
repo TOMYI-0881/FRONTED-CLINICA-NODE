@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { getDoctorProfile } from "@/home/lib/mock-images";
 import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
+import { formatDoctorName } from "@/lib/format-doctor-name";
 import type { Doctor } from "@/interfaces/doctor.interface";
 
 interface Props {
@@ -92,7 +93,7 @@ export const AdminDoctorsCarousel = ({ doctors, isLoading }: Props) => {
               {current.specialty}
             </span>
             <h3 className="mt-3 font-display text-2xl font-extrabold">
-              {current.name}
+              {formatDoctorName(current)}
             </h3>
             {place && (
               <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">

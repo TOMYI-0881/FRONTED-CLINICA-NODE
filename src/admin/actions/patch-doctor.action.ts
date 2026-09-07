@@ -1,10 +1,11 @@
 import { clinicApi } from "@/api/clinicApi";
-import type { Doctor } from "@/interfaces/doctor.interface";
+import type { Doctor, DoctorGender } from "@/interfaces/doctor.interface";
 
 interface UpdateDoctorInput {
   id: string;
   name?: string;
   specialty?: string;
+  gender?: DoctorGender;
 }
 
 // Solo edita el perfil (nombre/especialidad), no la cuenta/email.

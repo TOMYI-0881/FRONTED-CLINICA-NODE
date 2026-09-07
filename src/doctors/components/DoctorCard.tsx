@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuthStore } from "@/auth/store/auth.store";
+import { formatDoctorName } from "@/lib/format-doctor-name";
 import type { Doctor } from "@/interfaces/doctor.interface";
 import { CalendarPlus, Radio, Stethoscope } from "lucide-react";
 import { Link } from "react-router";
@@ -22,7 +23,7 @@ export const DoctorCard = ({ doctor }: Props) => {
         </div>
         <div className="min-w-0">
           <h3 className="truncate font-semibold text-foreground">
-            {doctor.name}
+            {formatDoctorName(doctor)}
           </h3>
           <p className="truncate text-sm text-muted-foreground">
             {doctor.specialty}

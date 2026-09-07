@@ -5,6 +5,7 @@ import { getDoctorProfile } from "@/home/lib/mock-images";
 import { DoctorAvatar } from "@/components/doctor/DoctorAvatar";
 import { CalendarDays, Clock3, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatDoctorName } from "@/lib/format-doctor-name";
 import type { Doctor } from "@/interfaces/doctor.interface";
 
 interface Props {
@@ -33,7 +34,7 @@ export const ProfessionalCard = ({ doctor, index }: Props) => {
         <span className="text-[11px] font-bold uppercase text-primary">
           {doctor.specialty}
         </span>
-        <h3 className="mt-1 font-display text-base font-bold">{doctor.name}</h3>
+        <h3 className="mt-1 font-display text-base font-bold">{formatDoctorName(doctor)}</h3>
         {place && (
           <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
             <MapPin className="size-3" />

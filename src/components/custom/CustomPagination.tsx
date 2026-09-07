@@ -42,11 +42,12 @@ const CustomPagination = ({ totalPages }: Props) => {
       <Button
         variant="outline"
         size="sm"
+        className="rounded-full"
         disabled={page === 1}
         onClick={() => handlePageChange(page - 1)}
       >
         <ChevronLeft className="h-4 w-4" />{" "}
-        <span className="hidden sm:inline">atras</span>
+        <span className="hidden sm:inline">Anterior</span>
       </Button>
       {visiblePages.map((pageNum, index) =>
         pageNum === "..." ? (
@@ -61,6 +62,7 @@ const CustomPagination = ({ totalPages }: Props) => {
             key={pageNum}
             variant={page === pageNum ? "default" : "outline"}
             size="sm"
+            className="rounded-full"
             onClick={() => handlePageChange(pageNum)}
           >
             {pageNum}
@@ -70,10 +72,11 @@ const CustomPagination = ({ totalPages }: Props) => {
       <Button
         variant="outline"
         size="sm"
+        className="rounded-full"
         disabled={page === totalPages}
         onClick={() => handlePageChange(page + 1)}
       >
-        <span className="hidden sm:inline">siguiente</span>{" "}
+        <span className="hidden sm:inline">Siguiente</span>{" "}
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>

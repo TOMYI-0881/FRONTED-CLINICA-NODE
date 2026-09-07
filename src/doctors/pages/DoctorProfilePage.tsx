@@ -4,6 +4,7 @@ import { useMyDoctorProfile } from "@/doctors/hooks/useMyDoctorProfile";
 import { getDoctorProfile } from "@/home/lib/mock-images";
 import { PhotoUploader } from "@/components/photo/PhotoUploader";
 import { useMyPhoto } from "@/auth/hooks/useMyPhoto";
+import { formatDoctorName } from "@/lib/format-doctor-name";
 
 export const DoctorProfilePage = () => {
   const user = useAuthStore((state) => state.user);
@@ -39,7 +40,7 @@ export const DoctorProfilePage = () => {
         </p>
         <div className="mt-4">
           <PhotoUploader
-            name={doctor.name}
+            name={formatDoctorName(doctor)}
             photoUrl={doctor.photoUrl ?? user?.photoUrl ?? null}
             size={128}
             pending={photoPending}
@@ -55,7 +56,7 @@ export const DoctorProfilePage = () => {
             <dt className="text-xs font-bold uppercase text-primary">
               Nombre
             </dt>
-            <dd className="mt-0.5 font-medium">{doctor.name}</dd>
+            <dd className="mt-0.5 font-medium">{formatDoctorName(doctor)}</dd>
           </div>
           <div>
             <dt className="text-xs font-bold uppercase text-primary">

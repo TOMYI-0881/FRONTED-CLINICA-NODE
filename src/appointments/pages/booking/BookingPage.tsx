@@ -11,6 +11,7 @@ import { SlotGrid } from "@/appointments/components/SlotGrid";
 import { DoctorHero } from "@/appointments/components/DoctorHero";
 import { getDoctorProfile } from "@/home/lib/mock-images";
 import { todayApiDate } from "@/lib/format-date";
+import { formatDoctorName } from "@/lib/format-doctor-name";
 import type { Slot } from "@/interfaces/appointment.interface";
 import { CalendarDays, Clock3, MapPin, MousePointerClick } from "lucide-react";
 
@@ -74,7 +75,7 @@ export const BookingPage = () => {
                 Reservá tu turno
               </h2>
               <p className="text-sm text-muted-foreground">
-                Elegí un día y horario disponible{doctor ? ` para ${doctor.name}` : ""}.
+                Elegí un día y horario disponible{doctor ? ` para ${formatDoctorName(doctor)}` : ""}.
               </p>
             </div>
 

@@ -10,11 +10,11 @@ export const AdminHeader = ({ onMenuClick }: HeaderProps) => {
   const user = useAuthStore((state) => state.user);
 
   return (
-    <header className="h-16 px-4 md:px-6 border-b border-border bg-card flex items-center justify-between sticky top-0 z-20">
-      <div className="flex items-center gap-3 flex-1">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-frost-edge bg-background/75 px-4 backdrop-blur-xl md:px-6">
+      <div className="flex flex-1 items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="md:hidden p-2 -ml-2 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="-ml-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-frost hover:text-foreground md:hidden"
           aria-label="Abrir menú"
         >
           <Menu size={20} />

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import { MyTurnNotification } from "@/queues/components/MyTurnNotification";
-import { useEffect, type PropsWithChildren } from "react";
+import { useEffect, useState, type PropsWithChildren } from "react";
 import { AppLoader } from "./layout/components/AppLoader";
 import { useAuthStore } from "@/auth/store/auth.store";
 
@@ -17,15 +17,21 @@ const queryClient = new QueryClient();
 // splash (AppLoader) cubre esa ventana de arranque.
 const CheckAuthProvider = ({ children }: PropsWithChildren) => {
   const authStatus = useAuthStore((state) => state.authStatus);
+  const [splashDone, setSplashDone] = useState(false);
 
   useEffect(() => {
     useAuthStore.getState().checkAuthStatus();
   }, []);
 
+  // El splash cubre toda la ventana de arranque y dura como mínimo su animación
+  // (2600ms): si la sesión resuelve antes, espera al onComplete; si tarda más,
+  // se mantiene hasta que authStatus deje de ser "checking".
+  const showSplash = authStatus === "checking" || !splashDone;
+
   return (
     <>
       {children}
-      {authStatus === "checking" && <AppLoader />}
+      {showSplash && <AppLoader onComplete={() => setSplashDone(true)} />}
     </>
   );
 };
